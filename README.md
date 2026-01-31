@@ -1,136 +1,94 @@
-# Portfolio Optimization with Modern Portfolio Theory
+# Markowitz Portfolio Optimization
 
-![Python](https://img.shields.io/badge/python-3.9+-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+A Monte Carlo approach to mean-variance portfolio optimization.
 
-## Project Overview
+## Objective
 
-Professional portfolio optimization system implementing Markowitz's Modern Portfolio Theory. Uses quadratic optimization to construct efficient portfolios that maximize risk-adjusted returns across 10 diversified stocks.
+This project implements a simple Markowitz portfolio optimization using Monte Carlo simulation. It identifies optimal long-only portfolios (maximum Sharpe ratio and minimum volatility) from a universe of 5 stocks, then backtests the resulting allocations against an equal-weight portfolio and the S&P 500 benchmark.
 
-## Key Features
+## Asset Universe
 
-- Efficient frontier generation (10,000 simulated portfolios)
-- Convex optimization for optimal asset allocation
-- Risk metrics: VaR, CVaR, Beta, Maximum Drawdown
-- Backtesting on historical data
-- Professional visualizations with Plotly
+| Ticker | Sector |
+|--------|--------|
+| AAPL | Technology |
+| MSFT | Technology |
+| JNJ | Healthcare |
+| PG | Consumer Staples |
+| JPM | Financials |
 
-## Results
+**Benchmark:** SPY (S&P 500 ETF)
 
-### Portfolio Performance
+## Data
 
-| Portfolio | Return | Volatility | Sharpe Ratio |
-|-----------|--------|------------|--------------|
-| **Max Sharpe** | **38.06%** | 17.14% | **2.10** |
-| Equal Weight | 18.09% | 11.95% | 1.35 |
-| Min Volatility | 12.34% | 10.19% | 1.01 |
+- **Source:** Yahoo Finance (adjusted close prices)
+- **Period:** January 2018 to present (~7 years)
+- **Frequency:** Daily
 
-### Key Findings
+## Methodology
 
-**Maximum Sharpe Portfolio (Sharpe 2.10 - Exceptional):**
-- Top 10% performance vs professional hedge funds
-- Optimal allocation: JPM 41%, GOOGL 36%, JNJ 10%, Others 13%
-- Significantly outperforms S&P 500 benchmark (Sharpe ~0.5-0.8)
+### Returns Computation
+- Daily simple returns: `r_t = (P_t / P_{t-1}) - 1`
+- **Annual return:** Compounded (CAGR), not arithmetic mean
+  - `CAGR = (cumulative_return)^(1/years) - 1`
+- **Annual volatility:** `std(daily_returns) * sqrt(252)`
+- **Sharpe ratio:** `(CAGR - Rf) / volatility`
+  - Risk-free rate: 3% annual
 
-**Minimum Volatility Portfolio:**
-- Lowest risk at 10.19% volatility
-- Defensive allocation: KO 26%, JNJ 18%, PG 14%
-- Ideal for capital preservation
+### Portfolio Optimization
+- Monte Carlo simulation of 10,000 random portfolios
+- Constraints: long-only (weights >= 0), fully invested (weights sum to 1)
+- Identification of:
+  - **Max Sharpe portfolio:** highest risk-adjusted return
+  - **Min Volatility portfolio:** lowest annualized standard deviation
 
-### What Makes These Results Strong
-
-- **Sharpe 2.10:** Exceptional risk-adjusted returns (professional target: 1.5-2.0)
-- **Intelligent diversification:** Balanced across tech, finance, and defensive sectors
-- **Realistic assumptions:** 3 years historical data, 2% risk-free rate
-- **Controlled volatility:** 17% vol for 38% return is excellent
-
-## Stock Universe
-
-10 stocks across 5 sectors:
-- Tech: AAPL, MSFT, GOOGL
-- Finance: JPM, BAC
-- Consumer: PG, KO
-- Healthcare: JNJ, UNH
-- Energy: XOM
-
-Benchmark: SPY (S&P 500)
-
-## Mathematical Framework
-
-**Portfolio Return:** Rp = Σ(wi × Ri)
-
-**Portfolio Variance:** σp² = w'Σw
-
-**Sharpe Ratio:** S = (Rp - Rf) / σp
-
-## Technologies
-
-- **PyPortfolioOpt:** Mean-variance optimization
-- **yfinance:** Automated data download
-- **NumPy/Pandas:** Numerical analysis
-- **Plotly:** Interactive visualizations
-- **CVXPY:** Convex optimization backend
-
-## Quick Start
-```bash
-# Clone repository
-git clone https://github.com/tomwbrg/portfolio-optimization.git
-cd portfolio-optimization
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run notebook
-jupyter notebook notebooks/portfolio_optimization.ipynb
-```
-
-Data downloads automatically - no manual setup required.
+### Backtesting
+- Initial investment: $10,000
+- Strategies compared:
+  - Max Sharpe portfolio
+  - Min Volatility portfolio
+  - Equal-weight portfolio (20% each)
+  - SPY benchmark
+- Metrics: total return, CAGR, volatility, Sharpe ratio, maximum drawdown
 
 ## Project Structure
+
 ```
 portfolio-optimization/
 ├── notebooks/
-│   └── portfolio_optimization.ipynb    # Complete analysis
+│   └── portfolio_optimization.ipynb
 ├── requirements.txt
 └── README.md
 ```
 
-## Real-World Applications
+## Requirements
 
-- **Asset Management:** Institutional portfolio construction
-- **Wealth Management:** Client-specific allocations
-- **Risk Management:** Portfolio risk assessment
-- **Quantitative Finance:** Research and strategy development
+```
+numpy
+pandas
+yfinance
+matplotlib
+```
 
-Used by hedge funds and asset managers for optimal capital allocation.
+## Usage
 
-## Future Improvements
+```bash
+pip install -r requirements.txt
+jupyter notebook notebooks/portfolio_optimization.ipynb
+```
 
-- Factor-based optimization (Fama-French factors)
-- Transaction cost modeling
-- Dynamic rebalancing strategies
-- Regime-dependent allocations
-- Constraints on sector exposure
+Data downloads automatically from Yahoo Finance.
 
-## Disclaimer
+## Limitations
 
-Educational project demonstrating Modern Portfolio Theory implementation. Past performance does not guarantee future results. Consult financial professionals before making investment decisions.
+- Optimization is based on historical data; future performance may differ.
+- Monte Carlo sampling approximates the efficient frontier but may not find the global optimum.
+- Transaction costs and rebalancing frictions are not modeled.
+- Results are sensitive to the sample period chosen.
 
 ## License
 
 MIT License
 
-## Author
+## References
 
-**Tom Weinberg**
-- GitHub: [@tomwbrg](https://github.com/tomwbrg)
-
-## Acknowledgments
-
-- Harry Markowitz for Modern Portfolio Theory
-- PyPortfolioOpt library for optimization tools
-- Yahoo Finance for historical data
-
----
-
-*Professional quantitative finance project showcasing optimization, risk management, and data-driven investment strategies.*
+- Markowitz, H. (1952). Portfolio Selection. *The Journal of Finance*, 7(1), 77-91.
